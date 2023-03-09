@@ -1,0 +1,1 @@
+from .di import get_note_service, get_posgresql_repository
