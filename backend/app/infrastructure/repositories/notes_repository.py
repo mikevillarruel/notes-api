@@ -108,7 +108,7 @@ class NotesRepository(INotesRepository):
         if not note_entity:
             raise Exception("Item not found")
 
-        categories = [category_entity.to_category()
+        categories = [category_entity.to_model()
                       for category_entity in note_entity.categories]
 
         return categories
