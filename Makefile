@@ -12,24 +12,24 @@ help: ## Show this help message
 
 .PHONY: build
 build: ## Build images
-	docker-compose build
+	docker-compose --profile dev build
 
 .PHONY: up
 up: ## Run app and initialize database
-	docker-compose up -d
+	docker-compose --profile dev up -d
 
 .PHONY: down
 down: ## Remove containers
-	docker-compose down --volumes --remove-orphans
+	docker-compose --profile "*" down --volumes --remove-orphans
 
 .PHONY: clean
 clean: ## Remove all (containers and images)
-	docker-compose down --volumes --remove-orphans --rmi all
+	docker-compose --profile "*" down --volumes --remove-orphans --rmi all
 
 .PHONY: stop
 stop: ## Stop app
-	docker-compose stop
+	docker-compose --profile "*" stop
 
 .PHONY: logs
 logs: ## Show logs
-	docker-compose logs -f
+	docker-compose --profile "*" logs -f

@@ -1,26 +1,53 @@
+x-backend-common:
+  &backend-common
+  image: notes-api
+  container_name: notes-api
+  build:
+    &backend-common-build
+    context: ./backend
+  ports:
+    - "8000:8000"
+  env_file:
+    - ./.env
+
+x-db-common:
+  &db-common
+  image: postgres:14.4
+  container_name: postgresql-db
+  environment:
+    - POSTGRES_USER=${POSTGRES_USER}
+    - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    - POSTGRES_DB=${POSTGRES_DB}
+  ports:
+    - "5432:5432"
+
 services:
-  backend:
-    image: notes-api
-    container_name: notes-api
-    build: ./backend
-    ports:
-      - "8000:8000"
+  backend_dev:
+    <<: *backend-common
+    profiles: [dev]
     depends_on:
-      - db
-    env_file:
-      - ./.env
+      - db_dev
+    build:
+      <<: *backend-common-build
+      target: dev
     volumes:
       - ./backend:/project
 
-  db:
-    image: postgres:14.4
-    container_name: postgresql-db
-    environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
-    ports:
-      - "5432:5432"
+  backend_prod:
+    <<: *backend-common
+    profiles: [prod]
+    depends_on:
+      - db_prod
+    build:
+      <<: *backend-common-build
+      target: prod
+
+  db_dev:
+    <<: *db-common
+    profiles: [dev]
     volumes:
       - ./data:/var/lib/postgresql/data
 
+  db_prod:
+    <<: *db-common
+    profiles: [prod]
