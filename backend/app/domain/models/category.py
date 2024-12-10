@@ -1,9 +1,10 @@
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
+from .note import NoteOut
 from .note_category import NoteCategory
 
 
@@ -16,28 +17,14 @@ class CategoryEntity(Base):
         back_populates="categories",
     )
 
-    def to_model(self):
-        return CategoryOut(
-            id=self.id,
-            name=self.name,
-        )
-
 
 class CategoryIn(BaseModel):
     name: str
 
-    def to_entity(self) -> CategoryEntity:
-        return CategoryEntity(
-            name=self.name,
-        )
-
 
 class CategoryOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: Optional[int] = None
     name: str
-
-    def to_entity(self) -> CategoryEntity:
-        return CategoryEntity(
-            id=self.id,
-            name=self.name,
-        )
+    notes: list[NoteOut] = []

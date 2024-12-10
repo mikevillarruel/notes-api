@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
@@ -16,36 +16,16 @@ class NoteEntity(Base):
         back_populates="notes",
     )
 
-    def to_model(self):
-        return NoteOut(
-            id=self.id,
-            title=self.title,
-            content=self.content,
-            is_archived=self.is_archived,
-        )
-
 
 class NoteIn(BaseModel):
     title: str
     content: str
 
-    def to_entity(self) -> NoteEntity:
-        return NoteEntity(
-            title=self.title,
-            content=self.content,
-        )
-
 
 class NoteOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     title: str
     content: str
     is_archived: bool
-
-    def to_entity(self) -> NoteEntity:
-        return NoteEntity(
-            id=self.id,
-            title=self.title,
-            content=self.content,
-            is_archived=self.is_archived,
-        )

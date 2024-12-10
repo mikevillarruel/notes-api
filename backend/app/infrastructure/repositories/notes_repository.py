@@ -21,7 +21,7 @@ class NotesRepository(INotesRepository):
                 note for note in notes
                 if category_id in [category.id for category in note.categories]
             ]
-        notes = [note.to_model() for note in notes]
+        notes = [NoteOut.model_validate(note) for note in notes]
         return notes
 
     def get_by_id(self, note_id: int) -> NoteOut:
@@ -30,15 +30,15 @@ class NotesRepository(INotesRepository):
         if not note:
             raise Exception("Item not found")
 
-        return note.to_model()
+        return NoteOut.model_validate(note)
 
     def add(self, note: NoteIn) -> NoteOut:
-        note_entity = note.to_entity()
+        note_entity = NoteEntity(title=note.title, content=note.content)
 
         self.db.session.add(note_entity)
         self.db.session.commit()
 
-        return note_entity.to_model()
+        return NoteOut.model_validate(note_entity)
 
     def update(self, note_id: int, note: NoteIn) -> NoteOut:
         note_entity = self.db.session \
@@ -54,7 +54,7 @@ class NotesRepository(INotesRepository):
 
         self.db.session.commit()
 
-        return note_entity.to_model()
+        return NoteOut.model_validate(note_entity)
 
     def delete(self, note_id: int) -> NoteOut:
         note_entity = self.db.session \
@@ -68,7 +68,7 @@ class NotesRepository(INotesRepository):
         self.db.session.delete(note_entity)
         self.db.session.commit()
 
-        return note_entity.to_model()
+        return NoteOut.model_validate(note_entity)
 
     def add_category(self, note_id: int, category_id: int) -> NoteOut:
         note_entity = self.db.session.get(NoteEntity, note_id)
@@ -84,7 +84,7 @@ class NotesRepository(INotesRepository):
 
         self.db.session.commit()
 
-        return note_entity.to_model()
+        return NoteOut.model_validate(note_entity)
 
     def remove_category(self, note_id: int, category_id: int) -> NoteOut:
         note_entity = self.db.session.get(NoteEntity, note_id)
@@ -100,7 +100,7 @@ class NotesRepository(INotesRepository):
 
         self.db.session.commit()
 
-        return note_entity.to_model()
+        return NoteOut.model_validate(note_entity)
 
     def get_categories(self, note_id: int) -> list[CategoryOut]:
         note_entity = self.db.session.get(NoteEntity, note_id)
@@ -108,7 +108,7 @@ class NotesRepository(INotesRepository):
         if not note_entity:
             raise Exception("Item not found")
 
-        categories = [category_entity.to_model()
+        categories = [CategoryOut.model_validate(category_entity)
                       for category_entity in note_entity.categories]
 
         return categories
@@ -126,4 +126,4 @@ class NotesRepository(INotesRepository):
 
         self.db.session.commit()
 
-        return note_entity.to_model()
+        return NoteOut.model_validate(note_entity)

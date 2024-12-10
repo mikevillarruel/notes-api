@@ -13,7 +13,7 @@ class CategoriesRepository(ICategoriesRepository):
             .query(CategoryEntity) \
             .order_by(CategoryEntity.id) \
             .all()
-        categories = [category.to_model() for category in categories]
+        categories = [CategoryOut.model_validate(category) for category in categories]
         return categories
 
     def get_by_id(self, category_id: int) -> CategoryOut:
@@ -22,15 +22,15 @@ class CategoriesRepository(ICategoriesRepository):
         if not category:
             raise Exception("Item not found")
 
-        return category.to_model()
+        return CategoryOut.model_validate(category)
 
     def add(self, category: CategoryIn) -> CategoryOut:
-        category_entity = category.to_entity()
+        category_entity = CategoryEntity(name=category.name)
 
         self.db.session.add(category_entity)
         self.db.session.commit()
 
-        return category_entity.to_model()
+        return CategoryOut.model_validate(category_entity)
 
     def update(self, category_id: int, category: CategoryIn) -> CategoryOut:
         category_entity = self.db.session \
@@ -45,7 +45,7 @@ class CategoriesRepository(ICategoriesRepository):
 
         self.db.session.commit()
 
-        return category_entity.to_model()
+        return CategoryOut.model_validate(category_entity)
 
     def delete(self, category_id: int) -> CategoryOut:
         category_entity = self.db.session \
@@ -59,4 +59,4 @@ class CategoriesRepository(ICategoriesRepository):
         self.db.session.delete(category_entity)
         self.db.session.commit()
 
-        return category_entity.to_model()
+        return CategoryOut.model_validate(category_entity)
