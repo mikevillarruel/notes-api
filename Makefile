@@ -33,3 +33,15 @@ stop: ## Stop app
 .PHONY: logs
 logs: ## Show logs
 	docker-compose --profile "*" logs -f
+
+.PHONY: db_migrate
+db_migrate: ## Create a new migration (e.g., make db_migrate comment="What did you change?")
+	docker-compose --profile dev exec backend_dev alembic revision --autogenerate -m "$(comment)"
+
+.PHONY: db_upgrade
+db_upgrade: ## Upgrade database schema to the latest version
+	docker-compose --profile dev exec backend_dev alembic upgrade head
+
+.PHONY: db_downgrade
+db_downgrade: ## Downgrade database schema to the previous version
+	docker-compose --profile dev exec backend_dev alembic downgrade -1
