@@ -2,7 +2,7 @@ FROM python:3.10 AS base
 
 WORKDIR /project
 
-COPY .  /project
+COPY . /project
 RUN pip install --no-cache-dir --upgrade -r /project/requirements.txt
 
 EXPOSE 8000
